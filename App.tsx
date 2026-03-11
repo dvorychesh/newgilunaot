@@ -118,6 +118,7 @@ function App() {
         isExcelFlow,
         savedReports: [], // Don't save all saved reports in current progress
         viewingSavedReport: false,
+        followUpQuestionsCount,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(progressToSave));
     } else {
@@ -389,10 +390,16 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <header className="text-center py-8">
-        <h1 className="text-4xl font-extrabold text-purple-900">מערכת AI לפרופיל תלמיד</h1>
-        <p className="text-xl text-gray-600 mt-2">ראיון דינמי ליצירת פרופיל פדגוגי והמלצות פעולה</p>
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-slate-100">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-cyan-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-6">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-l from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+              🎯 AI לפרופיל תלמיד
+            </h1>
+            <p className="text-slate-600 mt-2 text-lg">ניתוח מעמיק ותוכנית פעולה מותאמת אישית</p>
+          </div>
+        </div>
       </header>
 
       <main className="container mx-auto">
@@ -403,44 +410,84 @@ function App() {
         )}
 
         {entryMode === 'select_mode' && (
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto border border-purple-100">
-            <h2 className="text-2xl font-bold mb-4 text-center text-purple-800">בחר/י שיטת הזנה</h2>
-            <div className="flex flex-col space-y-4">
-              <button
-                onClick={() => setEntryMode('manual_entry')}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-              >
-                הזן/הזיני פרטים ידנית
-              </button>
-              <button
-                onClick={() => setEntryMode('excel_upload')}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-              >
-                העלה/העלי קובץ אקסל (CSV)
-              </button>
-              {savedReports.length > 0 && (
-                <>
-                  <button
-                    onClick={() => setEntryMode('view_saved_interviews')}
-                    className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-                  >
-                    הצג ראיונות שמורים ({savedReports.length})
-                  </button>
-                  <button
-                    onClick={() => setEntryMode('dashboard')}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-                  >
-                    📈 הצג דשבורד
-                  </button>
-                  <button
-                    onClick={() => setEntryMode('class_profile_generator')}
-                    className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-                  >
-                    🧑‍🏫 צור פרופיל כיתתי
-                  </button>
-                </>
-              )}
+          <div className="max-w-6xl mx-auto px-6 py-12">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-3 bg-gradient-to-l from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+                בחר/י שיטת הזנה
+              </h2>
+              <p className="text-gray-600 text-lg">בחר/י כיצד תרצה/י להתחיל ביצירת פרופיל תלמיד</p>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {/* Manual Entry Card */}
+              <div
+                onClick={() => setEntryMode('manual_entry')}
+                className="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-cyan-300 transition-all duration-300 overflow-hidden hover:scale-105 transform"
+              >
+                <div className="bg-gradient-to-b from-cyan-50 to-blue-50 p-8 text-center">
+                  <div className="text-5xl mb-4">✍️</div>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-2">הזן/הזיני ידנית</h3>
+                  <p className="text-slate-600 mb-4">הזן את פרטי בית הספר ותלמיד/ה וענה על שאלות בצורה אינטראקטיבית</p>
+                  <div className="text-sm text-cyan-600 font-semibold">לחץ/י להמשך →</div>
+                </div>
+              </div>
+
+              {/* Excel Upload Card */}
+              <div
+                onClick={() => setEntryMode('excel_upload')}
+                className="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-blue-300 transition-all duration-300 overflow-hidden hover:scale-105 transform"
+              >
+                <div className="bg-gradient-to-b from-blue-50 to-indigo-50 p-8 text-center">
+                  <div className="text-5xl mb-4">📊</div>
+                  <h3 className="text-2xl font-bold text-slate-800 mb-2">העלה קובץ CSV</h3>
+                  <p className="text-slate-600 mb-4">העלה קובץ אקסל עם פרטי תלמידים ותשובותיהם לניתוח מהיר</p>
+                  <div className="text-sm text-blue-600 font-semibold">לחץ/י להמשך →</div>
+                </div>
+              </div>
+            </div>
+
+            {savedReports.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Saved Interviews Card */}
+                <div
+                  onClick={() => setEntryMode('view_saved_interviews')}
+                  className="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-green-300 transition-all duration-300 overflow-hidden hover:scale-105 transform"
+                >
+                  <div className="bg-gradient-to-b from-green-50 to-emerald-50 p-6 text-center">
+                    <div className="text-5xl mb-3">📋</div>
+                    <h3 className="text-xl font-bold text-slate-800 mb-2">ראיונות שמורים</h3>
+                    <p className="text-slate-600 text-sm mb-3">צפה בדוחות שהוגנרו ({savedReports.length})</p>
+                    <div className="text-sm text-green-600 font-semibold">לחץ/י להמשך →</div>
+                  </div>
+                </div>
+
+                {/* Dashboard Card */}
+                <div
+                  onClick={() => setEntryMode('dashboard')}
+                  className="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-purple-300 transition-all duration-300 overflow-hidden hover:scale-105 transform"
+                >
+                  <div className="bg-gradient-to-b from-purple-50 to-pink-50 p-6 text-center">
+                    <div className="text-5xl mb-3">📈</div>
+                    <h3 className="text-xl font-bold text-slate-800 mb-2">דשבורד</h3>
+                    <p className="text-slate-600 text-sm mb-3">צפה בסטטיסטיקות וניתוחים מפורטים</p>
+                    <div className="text-sm text-purple-600 font-semibold">לחץ/י להמשך →</div>
+                  </div>
+                </div>
+
+                {/* Class Profile Card */}
+                <div
+                  onClick={() => setEntryMode('class_profile_generator')}
+                  className="group cursor-pointer bg-white rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-teal-300 transition-all duration-300 overflow-hidden hover:scale-105 transform"
+                >
+                  <div className="bg-gradient-to-b from-teal-50 to-cyan-50 p-6 text-center">
+                    <div className="text-5xl mb-3">🧑‍🏫</div>
+                    <h3 className="text-xl font-bold text-slate-800 mb-2">פרופיל כיתתי</h3>
+                    <p className="text-slate-600 text-sm mb-3">צור ניתוח מקיף של כל הכיתה</p>
+                    <div className="text-sm text-teal-600 font-semibold">לחץ/י להמשך →</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -504,33 +551,43 @@ function App() {
         {isLoading && !reportMarkdown && <Loader />}
       </main>
 
-      <footer className="text-center py-6 mt-8 text-gray-500 text-sm flex justify-center items-center space-x-4 space-x-reverse">
-        <p>&copy; 2026 מערכת AI לפרופיל תלמיד. כל הזכויות שמורות.</p>
-        <button
-          onClick={handleToggleAbout}
-          className="text-purple-600 hover:text-purple-800 font-semibold transition duration-300 ease-in-out"
-        >
-          אודות
-        </button>
+      <footer className="border-t border-slate-200 mt-16 py-10 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-6 flex justify-center items-center space-x-6 space-x-reverse">
+          <p className="text-slate-600 text-sm">&copy; 2026 מערכת AI לפרופיל תלמיד</p>
+          <button
+            onClick={handleToggleAbout}
+            className="text-cyan-600 hover:text-cyan-700 font-semibold transition duration-300 ease-in-out text-sm"
+          >
+            📖 אודות
+          </button>
+        </div>
       </footer>
 
-      {/* About Modal/Section */}
+      {/* About Modal */}
       {showAbout && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md mx-auto text-center border border-purple-200">
-            <h2 className="text-3xl font-bold mb-4 text-purple-800">אודות מערכת AI לפרופיל תלמיד</h2>
-            <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-              מערכת זו פותחה כדי לסייע למחנכים ליצור פרופילים פדגוגיים מקיפים לתלמידים. על ידי מענה על 10 שאלות מפתח, המערכת מנתחת את הנתונים ומספקת דוח מפורט הכולל חוזקות, חסמים, תוכנית פעולה והמלצות התערבותיות מותאמות אישית.
-            </p>
-            <p className="text-gray-600 text-sm mt-4">
-              המערכת מופעלת על ידי מודל השפה המתקדם <a href="https://ai.google.dev/models/gemini" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Gemini Pro</a> מבית Google, המאפשר ניתוח עמוק והפקת תובנות פדגוגיות מבוססות נתונים.
-            </p>
-            <button
-              onClick={handleToggleAbout}
-              className="mt-8 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-            >
-              סגור
-            </button>
+        <div className="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg mx-auto text-right border border-slate-200">
+            <div className="bg-gradient-to-r from-cyan-50 to-blue-50 px-8 py-8 border-b border-slate-200">
+              <h2 className="text-3xl font-bold text-slate-800">ℹ️ אודות המערכת</h2>
+            </div>
+            <div className="p-8 space-y-5">
+              <p className="text-slate-700 text-lg leading-relaxed">
+                מערכת זו פותחה כדי לסייע למחנכים ליצור פרופילים פדגוגיים מקיפים לתלמידים. על ידי מענה על 10 שאלות מפתח, המערכת מנתחת את הנתונים ומספקת דוח מפורט הכולל חוזקות, חסמים, תוכנית פעולה והמלצות התערבותיות מותאמות אישית.
+              </p>
+              <div className="bg-cyan-50 rounded-lg p-4 border border-cyan-200">
+                <p className="text-slate-700 text-sm">
+                  המערכת מופעלת על ידי מודל השפה המתקדם <a href="https://ai.google.dev/models/gemini" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:underline font-semibold">Gemini Pro</a> מבית Google, המאפשר ניתוח עמוק והפקת תובנות פדגוגיות מבוססות נתונים.
+                </p>
+              </div>
+            </div>
+            <div className="border-t border-slate-200 px-8 py-6 flex justify-end">
+              <button
+                onClick={handleToggleAbout}
+                className="bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800 text-white font-bold py-2 px-6 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+              >
+                סגור
+              </button>
+            </div>
           </div>
         </div>
       )}

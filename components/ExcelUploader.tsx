@@ -265,30 +265,86 @@ const ExcelUploader: React.FC<ExcelUploaderProps> = ({ onDataParsed }) => {
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto my-8 border border-purple-100">
-      <h2 className="text-3xl font-bold mb-5 text-center text-purple-800">העלה/העלי קובץ אקסל (CSV)</h2>
-      <p className="text-gray-600 mb-7 text-center text-lg">
-        אנא העלה/העלי קובץ CSV המכיל את פרטי התלמיד/ה ותשובות לשאלות.
-        <br/>
-        <strong className="text-purple-700">ודא/י שכותרות העמודות כוללות את מילות המפתח המתאימות לשאלות הפדגוגיות ואת הכותרות 'שם התלמיד/ה', 'כיתה', ו-'גיל'.</strong>
-      </p>
-      <div className="flex flex-col space-y-5">
-        <input
-          type="file"
-          accept=".csv"
-          onChange={handleFileChange}
-          className="block w-full text-lg text-gray-700 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-lg file:font-semibold file:bg-purple-100 file:text-purple-800 hover:file:bg-purple-200 transition duration-300 ease-in-out cursor-pointer"
-        />
-        {error && <p className="text-red-500 text-base text-center mt-3">{error}</p>}
-        <button
-          onClick={handleUpload}
-          className={`bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 ${
-            !file || isLoading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
-          disabled={!file || isLoading}
-        >
-          {isLoading ? 'טוען...' : 'נתח/י קובץ'}
-        </button>
+    <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-10">
+        <div className="text-center mb-8">
+          <h2 className="text-4xl font-bold mb-3 bg-gradient-to-l from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+            📊 העלא קובץ CSV
+          </h2>
+          <p className="text-slate-600 text-lg">
+            העלה קובץ אקסל המכיל פרטי תלמידים ותשובות לשאלות הפדגוגיות
+          </p>
+        </div>
+
+        {/* Instructions Box */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 mb-8">
+          <p className="text-slate-700 text-base leading-relaxed text-right">
+            <strong className="text-slate-800">📋 דרישות הקובץ:</strong>
+          </p>
+          <ul className="text-slate-600 text-sm mt-3 space-y-2 text-right list-disc list-inside">
+            <li>שמות עמודות המכילות: <strong>שם התלמיד/ה</strong>, <strong>כיתה</strong>, ו<strong>גיל</strong></li>
+            <li>עמודות נוספות עם מילות מפתח משאלות הפדגוגיות (חוזקות, חשיבה, שפה, וכו')</li>
+            <li>עמוד אחד לתלמיד, או שורה ראשונה עם הנתונים</li>
+            <li>פורמט: CSV (מופרד בפסיקים)</li>
+          </ul>
+        </div>
+
+        <div className="flex flex-col space-y-6">
+          {/* File Input */}
+          <div className="space-y-2">
+            <label className="block text-slate-700 font-semibold text-right text-base">
+              בחר קובץ לעיבוד:
+            </label>
+            <div className="relative">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-slate-500
+                  file:mr-4 file:py-3 file:px-6 file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold file:bg-gradient-to-r
+                  file:from-blue-500 file:to-indigo-600 file:text-white
+                  hover:file:from-blue-600 hover:file:to-indigo-700
+                  cursor-pointer transition duration-300
+                  border border-slate-300 rounded-xl p-3 bg-slate-50 hover:bg-white
+                  focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            {file && (
+              <p className="text-sm text-green-600 font-semibold mt-2">
+                ✓ {file.name}
+              </p>
+            )}
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 border border-red-300 rounded-xl p-4">
+              <p className="text-red-700 text-base text-right font-semibold">⚠️ שגיאה</p>
+              <p className="text-red-600 text-sm mt-1 text-right">{error}</p>
+            </div>
+          )}
+
+          {/* Upload Button */}
+          <button
+            onClick={handleUpload}
+            className={`w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-4 px-8 rounded-xl text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105 ${
+              !file || isLoading ? 'opacity-60 cursor-not-allowed hover:scale-100' : ''
+            }`}
+            disabled={!file || isLoading}
+          >
+            {isLoading ? (
+              <span>⏳ מעבד את הקובץ...</span>
+            ) : (
+              <span>✓ נתח וצור דוח</span>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Help Text */}
+      <div className="mt-8 max-w-2xl mx-auto text-center text-slate-500 text-sm">
+        <p>תמיכה בקבצי CSV עם פרטי תלמידים וניתוח מהיר לקבוצות תלמידים</p>
       </div>
     </div>
   );

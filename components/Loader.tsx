@@ -2,9 +2,9 @@ import React from 'react';
 
 const Loader: React.FC = () => {
   return (
-    <div className="flex items-center justify-center p-4">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-      <p className="mr-3 text-lg text-purple-700">אנו מעבדים את הנתונים, הפעולה עשויה לקחת מספר שניות...</p>
+    <div className="flex items-center justify-center p-4 gap-3">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-500"></div>
+      <p className="text-base text-cyan-600 font-semibold">מעבד את הנתונים...</p>
     </div>
   );
 };

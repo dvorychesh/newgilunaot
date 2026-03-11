@@ -18,15 +18,18 @@ const SavedInterviewsList: React.FC<SavedInterviewsListProps> = ({
 
   if (savedReports.length === 0) {
     return (
-      <div className="bg-white p-8 rounded-xl shadow-lg max-w-xl mx-auto my-8 text-center border border-purple-100">
-        <h2 className="text-3xl font-bold mb-5 text-purple-800">אין ראיונות שמורים</h2>
-        <p className="text-gray-600 mb-7 text-lg">לא נמצאו דוחות תלמידים שמורים. התחל/י ראיון חדש כדי ליצור אחד!</p>
-        <button
-          onClick={onBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-        >
-          חזור למסך הראשי
-        </button>
+      <div className="max-w-2xl mx-auto px-6 py-12">
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-10 text-center">
+          <div className="text-6xl mb-4">📋</div>
+          <h2 className="text-3xl font-bold mb-3 text-slate-800">אין ראיונות שמורים</h2>
+          <p className="text-slate-600 text-lg mb-8">לא נמצאו דוחות תלמידים שמורים. התחל/י ראיון חדש כדי ליצור אחד!</p>
+          <button
+            onClick={onBack}
+            className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-xl text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+          >
+            ← חזור למסך הראשי
+          </button>
+        </div>
       </div>
     );
   }
@@ -40,61 +43,85 @@ const SavedInterviewsList: React.FC<SavedInterviewsListProps> = ({
   });
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto my-8 border border-purple-100">
-      <h2 className="text-3xl font-bold mb-6 text-center text-purple-900">ראיונות שמורים</h2>
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 px-2">
-        <label htmlFor="sort-order" className="ml-2 text-gray-700 font-semibold mb-2 sm:mb-0 text-lg">
-          מיין לפי תאריך:
-        </label>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-l from-green-600 to-emerald-700 bg-clip-text text-transparent">
+          📋 ראיונות שמורים
+        </h1>
+        <p className="text-slate-600 text-lg">צפה בדוחות שנוצרו ({savedReports.length})</p>
+      </div>
+
+      {/* Sort Controls */}
+      <div className="flex justify-between items-center mb-8 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
         <select
           id="sort-order"
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value as 'desc' | 'asc')}
-          className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-right text-base bg-gray-50 appearance-none pr-8"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'left 0.5rem center', backgroundSize: '1.5em' }}
+          className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 text-right bg-slate-50 text-base font-medium"
         >
           <option value="desc">מהחדש לישן</option>
           <option value="asc">מהישן לחדש</option>
         </select>
+        <label htmlFor="sort-order" className="text-slate-700 font-semibold text-base">
+          מיין לפי תאריך:
+        </label>
       </div>
-      <div className="space-y-4">
+
+      {/* Reports List */}
+      <div className="space-y-4 mb-10">
         {sortedReports.map((report) => (
-            <div
-              key={report.id}
-              className="flex flex-col sm:flex-row items-center justify-between bg-gray-100 p-5 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition duration-200 ease-in-out"
-            >
-              <div className="text-right sm:text-left mb-3 sm:mb-0 sm:ml-4 flex-grow">
-                <p className="font-semibold text-xl text-purple-800">
-                  {report.studentName} (<span className="text-gray-700">{report.studentClass}</span>, גיל {report.studentAge})
+          <div
+            key={report.id}
+            className="bg-white rounded-xl shadow-md border border-slate-200 p-6 hover:shadow-lg hover:border-slate-300 transition-all duration-200"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              {/* Report Info */}
+              <div className="flex-grow text-right">
+                <p className="font-bold text-2xl text-slate-800 mb-2">
+                  👤 {report.studentName}
                 </p>
-                <p className="text-gray-600 text-sm">{report.schoolName}</p>
-                <p className="text-gray-500 text-xs mt-1">
-                  נשמר בתאריך: {new Date(report.timestamp).toLocaleString('he-IL')}
+                <p className="text-slate-600 text-base mb-1">
+                  📚 <span className="font-semibold">{report.schoolName}</span> | 🎓 כיתה {report.studentClass} | 🎂 גיל {report.studentAge}
+                </p>
+                <p className="text-slate-500 text-sm">
+                  📅 {new Date(report.timestamp).toLocaleString('he-IL', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 sm:space-x-reverse w-full sm:w-auto">
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 flex-col sm:flex-row">
                 <button
                   onClick={() => onViewReport(report)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg text-sm transition duration-300 ease-in-out shadow-md transform hover:scale-105 flex-grow sm:flex-none"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800 text-white font-bold py-2 px-6 rounded-lg text-sm transition duration-300 ease-in-out shadow-md transform hover:scale-105"
                 >
-                  הצג דוח
+                  👁️ הצג דוח
                 </button>
                 <button
                   onClick={() => onDeleteReport(report.id)}
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg text-sm transition duration-300 ease-in-out shadow-md transform hover:scale-105 flex-grow sm:flex-none"
+                  className="flex-1 sm:flex-none bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-lg text-sm transition duration-300 ease-in-out shadow-md transform hover:scale-105"
                 >
-                  מחק
+                  🗑️ מחק
                 </button>
               </div>
             </div>
-          ))}
+          </div>
+        ))}
       </div>
-      <div className="text-center mt-8">
+
+      {/* Back Button */}
+      <div className="text-center">
         <button
           onClick={onBack}
-          className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+          className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-xl text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
         >
-          חזור למסך הראשי
+          ← חזור למסך הראשי
         </button>
       </div>
     </div>

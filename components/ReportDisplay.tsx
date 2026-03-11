@@ -73,39 +73,65 @@ const ReportDisplay: React.FC<ReportDisplayProps> = ({
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-xl max-w-4xl mx-auto my-8 border border-purple-100">
-      <h2 className="text-3xl font-bold mb-6 text-center text-purple-900">דוח פרופיל תלמיד</h2>
+    <div className="max-w-5xl mx-auto px-6 py-12">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-l from-cyan-600 to-blue-700 bg-clip-text text-transparent">
+          📊 דוח פרופיל תלמיד
+        </h1>
+        <p className="text-slate-600 text-lg">ניתוח מפורט ותוכנית פעולה מותאמת</p>
+      </div>
+
+      {/* Error Alert */}
       {exportError && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-center" role="alert">
-          <span className="block sm:inline">{exportError}</span>
+        <div className="bg-red-50 border border-red-300 rounded-xl p-5 mb-8 text-right">
+          <p className="text-red-700 font-semibold mb-2">⚠️ שגיאה בייצוא</p>
+          <p className="text-red-600 text-sm">{exportError}</p>
         </div>
       )}
-      <div ref={reportRef} className="border border-gray-200 p-6 rounded-md bg-gray-50">
-        <MarkdownRenderer markdown={markdownContent} interventionBank={interventionBank} />
+
+      {/* Report Content */}
+      <div ref={reportRef} className="bg-white rounded-2xl shadow-lg border border-slate-200 p-10 mb-10">
+        <div className="prose prose-sm max-w-none text-right space-y-6">
+          <MarkdownRenderer markdown={markdownContent} interventionBank={interventionBank} />
+        </div>
       </div>
-      <div className="flex flex-col sm:flex-row justify-center mt-8 space-y-4 sm:space-y-0 sm:space-x-4 sm:space-x-reverse"> {/* Added space-x-reverse for RTL */}
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {isViewingSavedReport && onBackToSavedList && (
           <button
             onClick={onBackToSavedList}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+            className="flex-1 sm:flex-none bg-slate-600 hover:bg-slate-700 text-white font-bold py-3 px-8 rounded-xl text-base transition duration-300 ease-in-out shadow-md transform hover:scale-105"
           >
-            חזור לרשימת ראיונות
+            ← חזור לרשימה
           </button>
         )}
+
         <button
           onClick={handleExportPdf}
-          className={`bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md flex items-center justify-center transform hover:scale-105 ${
-            isExporting ? 'opacity-50 cursor-not-allowed' : ''
+          className={`flex-1 sm:flex-none bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-3 px-8 rounded-xl text-base transition duration-300 ease-in-out shadow-md transform hover:scale-105 flex items-center justify-center gap-2 ${
+            isExporting ? 'opacity-60 cursor-not-allowed hover:scale-100' : ''
           }`}
           disabled={isExporting}
         >
-          {isExporting ? <Loader /> : '⬇️ ייצא ל-PDF'}
+          {isExporting ? (
+            <>
+              <Loader />
+              <span>מייצא...</span>
+            </>
+          ) : (
+            <>
+              📥 ייצא ל-PDF
+            </>
+          )}
         </button>
+
         <button
           onClick={onStartNewInterview}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+          className="flex-1 sm:flex-none bg-gradient-to-r from-cyan-600 to-blue-700 hover:from-cyan-700 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-xl text-base transition duration-300 ease-in-out shadow-md transform hover:scale-105"
         >
-          התחל ראיון חדש
+          ✨ ראיון חדש
         </button>
       </div>
     </div>
