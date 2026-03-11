@@ -24,6 +24,11 @@ const loadFullAppState = (): AppState => {
     const parsedProgress: AppState = serializedProgress ? JSON.parse(serializedProgress) : {};
     const parsedCompleted: CompletedInterview[] = serializedCompleted ? JSON.parse(serializedCompleted) : [];
 
+    console.log("📂 Loaded from localStorage:", {
+      savedReportsCount: parsedCompleted.length,
+      studentNames: parsedCompleted.map(r => r.studentName)
+    });
+
     // Return default initial state if nothing is in localStorage or merge with existing progress
     return {
       entryMode: parsedProgress.entryMode ?? 'select_mode',
@@ -136,7 +141,9 @@ function App() {
 
   // Effect to save *completed reports* whenever savedReports state changes
   useEffect(() => {
+    console.log("💾 Saving reports to localStorage:", savedReports.length, "reports");
     localStorage.setItem(COMPLETED_INTERVIEWS_KEY, JSON.stringify(savedReports));
+    console.log("✅ Reports saved successfully");
   }, [savedReports]);
 
 
@@ -200,11 +207,12 @@ function App() {
         reportMarkdown: markdown,
         followUpQuestionsCount: 0, // Excel flow doesn't have follow-up questions
       };
+      console.log("📌 New Excel report created:", { studentName: data.studentName, studentClass: data.studentClass });
       setSavedReports((prev) => [...prev, newReport]);
       setViewingSavedReport(false);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Excel flow error:", err);
       setError("אירעה שגיאה בעיבוד הנתונים. אנא נסה/נסי שוב.");
     } finally {
       setIsLoading(false);
@@ -294,6 +302,7 @@ function App() {
               reportMarkdown: markdown,
               followUpQuestionsCount,
             };
+            console.log("📌 New manual report created:", { studentName, studentClass });
             setSavedReports((prev) => [...prev, newReport]);
             setViewingSavedReport(false); // New report, not viewing a saved one
             localStorage.removeItem(LOCAL_STORAGE_KEY); // Clear current progress
