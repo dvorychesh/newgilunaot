@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת AI לפרופיל תלמיד</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        direction: rtl; /* Set default direction to Right-to-Left */
+      }
+      /* Custom styles for specific Markdown elements */
+      .markdown-h1 {
+        font-size: 2.5rem; /* Larger font size for main title */
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+      .markdown-h3-summary {
+        background-color: #F3E5F5; /* light purple */
+        border-right: 4px solid #9C27B0; /* deep purple border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #4A0055; /* darker purple for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-strengths { /* New style for Strengths section */
+        background-color: #E8F5E9; /* mint green */
+        border-right: 4px solid #4CAF50; /* green border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2E7D32; /* dark green for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-challenges { /* New style for Challenges section */
+        background-color: #FFF3E0; /* light orange/yellow */
+        border-right: 4px solid #FF9800; /* orange border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #EF6C00; /* dark orange for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-analysis {
+        background-color: #ECEFF1; /* light blue-grey */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #263238; /* dark grey for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-action-plan {
+        background-color: #E8F5E9; /* mint green */
+        border: 1px solid #A5D6A7; /* subtle green border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2E7D32; /* dark green for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      /* New styles for Class Profile H3s */
+      .markdown-h3-class-overview {
+        background-color: #E0F7FA; /* light cyan */
+        border-right: 4px solid #00BCD4; /* cyan border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #006064; /* dark cyan for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-class-strengths {
+        background-color: #E0F2F7; /* very light blue */
+        border-right: 4px solid #2196F3; /* blue border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1565C0; /* dark blue for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-class-challenges {
+        background-color: #FFEBEE; /* very light red */
+        border-right: 4px solid #F44336; /* red border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #C62828; /* dark red for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-class-trends {
+        background-color: #F3E5F5; /* light purple */
+        border-right: 4px solid #9C27B0; /* deep purple border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #4A0055; /* darker purple for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-h3-class-recommendations {
+        background-color: #E8F5E9; /* mint green */
+        border-right: 4px solid #4CAF50; /* green border */
+        padding: 1rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #2E7D32; /* dark green for text */
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .markdown-h3-other { /* Default style for other H3s not covered by specific categories */
+        background-color: #f0f0f0;
+        border-right: 3px solid #ccc;
+        padding: 0.8rem 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.8rem;
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #555;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .markdown-list {
+        list-style-type: disc; /* Default disc for bullet points */
+        padding-right: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .markdown-list-item {
+        margin-bottom: 0.5rem;
+        color: #4A4A4A;
+      }
+      .markdown-list-numbered {
+        list-style-type: decimal;
+        padding-right: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .markdown-paragraph {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+        color: #333;
+      }
+      .markdown-strong {
+        font-weight: bold;
+        color: #000;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.42.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-markdown": "https://esm.sh/react-markdown@^10.1.0",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "chart.js": "https://esm.sh/chart.js@^4.4.3",
+    "react-chartjs-2": "https://esm.sh/react-chartjs-2@^5.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+</body>
+</html>
