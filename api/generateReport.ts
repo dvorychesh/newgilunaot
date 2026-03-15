@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.VITE_API_KEY || '');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.VITE_API_KEY || '' });
 
 function buildSystemPrompt(ageGroup, schoolName, studentName, studentClass, studentAge, rawTeacherData) {
   return `אתה מנתח AI מתחום בפדגוגיה ופסיכולוגיה חינוכית. על סמך נתוני מורה/ת על תלמיד/ה, צור פרופיל תלמיד מקיף ומעמיק בעברית.
@@ -37,14 +37,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const {
-      ageGroup,
-      schoolName,
-      studentName,
-      studentClass,
-      studentAge,
-      answers,
-    } = req.body;
+    const { ageGroup, schoolName, studentName, studentClass, studentAge, answers } = req.body;
 
     if (!studentName || !answers) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -54,7 +47,7 @@ export default async function handler(req, res) {
       .map((ans) => `${ans.topic}: ${Array.isArray(ans.answers) ? ans.answers.join(' | ') : ans.answers}`)
       .join('\n\n');
 
-    const systemPrompt = buildSystemPrompt(
+    const prompt = buildSystemPrompt(
       ageGroup || '',
       schoolName || '',
       studentName,
@@ -63,18 +56,15 @@ export default async function handler(req, res) {
       rawTeacherData
     );
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-pro',    });
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+    });
 
-    const result = await model.generateContent(systemPrompt);
-    const reportMarkdown = result.response.text();
-
+    const reportMarkdown = response.text;
     return res.status(200).json({ reportMarkdown });
   } catch (error) {
     console.error('Error in generateReport API:', error);
-    return res.status(500).json({
-      error: 'Failed to generate report',
-      details: error.message,
-    });
+    return res.status(500).json({ error: 'Failed to generate report', details: error.message });
   }
 }
