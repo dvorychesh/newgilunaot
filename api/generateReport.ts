@@ -1,14 +1,37 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { AgeGroup, InterviewAnswer, InterventionBank } from '../types';
-import { AI_ANALYZER_SYSTEM_PROMPT_TEMPLATE } from '../constants';
 
-const genAI = new GoogleGenerativeAI(process.env.VITE_API_KEY || '');
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.VITE_API_KEY || '');
 
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse
-) {
+function buildSystemPrompt(ageGroup, schoolName, studentName, studentClass, studentAge, rawTeacherData) {
+  return `אתה מנתח AI מתחום בפדגוגיה ופסיכולוגיה חינוכית. על סמך נתוני מורה/ת על תלמיד/ה, צור פרופיל תלמיד מקיף ומעמיק בעברית.
+
+פרטי התלמיד:
+- שם: ${studentName}
+- כיתה: ${studentClass}
+- גיל: ${studentAge}
+- בית ספר: ${schoolName}
+
+מידע מהמורה/ת:
+${rawTeacherData}
+
+צור דוח פרופיל מקיף הכולל:
+1. סיכום מנהלי (קצר וקולע)
+2. פרופיל למידה (סגנון, חוזקות, קשיים)
+3. תפקוד חברתי-רגשי
+4. מוטיבציה ורצונות
+5. עצות פרקטיות למורה/ת
+6. תוכנית עבודה מומלצת`;
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -21,55 +44,34 @@ export default async function handler(
       studentClass,
       studentAge,
       answers,
-      interventionBank,
     } = req.body;
 
-    // Validate required fields
-    if (
-      !ageGroup ||
-      !schoolName ||
-      !studentName ||
-      !studentClass ||
-      !studentAge ||
-      !answers ||
-      !interventionBank
-    ) {
+    if (!studentName || !answers) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Format teacher data from answers
     const rawTeacherData = answers
-      .map(
-        (ans: InterviewAnswer) =>
-          `${ans.topic}: ${ans.answers.join(' | ')}`
-      )
+      .map((ans) => `${ans.topic}: ${Array.isArray(ans.answers) ? ans.answers.join(' | ') : ans.answers}`)
       .join('\n\n');
 
-    // Get the system prompt
-    const systemPrompt = AI_ANALYZER_SYSTEM_PROMPT_TEMPLATE(
-      ageGroup,
-      schoolName,
+    const systemPrompt = buildSystemPrompt(
+      ageGroup || '',
+      schoolName || '',
       studentName,
-      studentClass,
-      studentAge,
-      rawTeacherData,
-      JSON.stringify(interventionBank, null, 2)
+      studentClass || '',
+      studentAge || '',
+      rawTeacherData
     );
 
-    // Call Gemini API
     const model = genAI.getGenerativeModel({
-      model: 'gemini-pro',
-      systemInstruction: systemPrompt,
+      model: 'gemini-1.5-flash',
     });
 
-    const result = await model.generateContent(
-      `Generate a student profile report for ${studentName}.`
-    );
-
+    const result = await model.generateContent(systemPrompt);
     const reportMarkdown = result.response.text();
 
     return res.status(200).json({ reportMarkdown });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error in generateReport API:', error);
     return res.status(500).json({
       error: 'Failed to generate report',
