@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.VITE_API_KEY || '');
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.VITE_API_KEY || '' });
 
 const AI_ASSESSOR_PROMPT = `You are an evaluator of student responses in Hebrew.
 Your task: Assess the quality and depth of a student's answer to a pedagogical question.
@@ -38,27 +38,26 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing question or answer' });
     }
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-pro',    });
+    const prompt = `${AI_ASSESSOR_PROMPT}\n\nQuestion: ${question}\nAnswer: ${answer}`;
 
-    const prompt = `Question: ${question}\nAnswer: ${answer}`;
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+    });
 
-    let parsed;
-    try {
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
-    } catch {
-      parsed = { status: 'PASS', follow_up_question: null };
+    const responseText = response.text.trim();
+
+    let jsonText = responseText;
+    const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/);
+    if (jsonMatch) {
+      jsonText = jsonMatch[1];
     }
 
-    return res.status(200).json(parsed);
+    const assessment = JSON.parse(jsonText);
+
+    return res.status(200).json(assessment);
   } catch (error) {
-    console.error('Error in checkAnswer:', error);
-    return res.status(500).json({
-      error: 'Failed to check answer',
-      details: error.message,
-    });
+    console.error('Error in checkAnswer API:', error);
+    return res.status(500).json({ error: 'Failed to assess answer', details: error.message });
   }
 }
